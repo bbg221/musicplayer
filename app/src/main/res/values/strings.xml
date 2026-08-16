@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">音乐播放器</string>
+    <string name="tab_songs">歌曲</string>
+    <string name="tab_playlists">歌单</string>
+    <string name="local_music">本地音乐</string>
+    <string name="song_count">共 %1$d 首歌曲</string>
+    <string name="no_songs">没有找到歌曲，请先授权读取音频</string>
+    <string name="no_permission">需要存储权限才能扫描本地音乐</string>
+    <string name="permission_denied">权限被拒绝，无法扫描本地音乐</string>
+    <string name="new_playlist">新建歌单</string>
+    <string name="playlist_name_hint">歌单名称</string>
+    <string name="playlist_name_empty">歌单名称不能为空</string>
+    <string name="no_playlists">还没有歌单，点击右下角 + 新建</string>
+    <string name="add_to_playlist">加入歌单</string>
+    <string name="no_playlist_hint">请先创建歌单</string>
+    <string name="added_to_playlist">已加入歌单：%1$s</string>
+    <string name="already_in_playlist">这首歌已在歌单中</string>
+    <string name="delete_song_title">删除歌曲</string>
+    <string name="delete_song_msg">确定要从设备中删除《%1$s》吗？</string>
+    <string name="delete_playlist_title">删除歌单</string>
+    <string name="delete_playlist_msg">确定要删除歌单《%1$s》吗？</string>
+    <string name="remove_from_playlist">从歌单移除</string>
+    <string name="removed_from_playlist">已从歌单移除</string>
+    <string name="delete">删除</string>
+    <string name="cancel">取消</string>
+    <string name="ok">确定</string>
+    <string name="add_songs">添加歌曲</string>
+    <string name="playlist_songs_count">%1$d 首</string>
+    <string name="no_songs_in_playlist">歌单是空的，点击右下角 + 添加歌曲</string>
+    <string name="mode_sequence">顺序播放</string>
+    <string name="mode_loop_one">单曲循环</string>
+    <string name="now_playing">正在播放</string>
+    <string name="not_playing">未在播放</string>
+    <string name="delete_failed">删除失败</string>
+    <string name="song_deleted">已删除《%1$s》</string>
+    <string name="select_playlist">选择歌单</string>
+</resources>
