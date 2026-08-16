@@ -23,6 +23,14 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 class MusicService : Service(), MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener {
 
+    interface PlayerListener {
+        fun onSongChanged(song: Song?, index: Int) {}
+        fun onPlayStateChanged(playing: Boolean) {}
+        fun onModeChanged(mode: Int) {}
+        fun onPositionChanged(position: Long, duration: Long) {}
+        fun onQueueChanged() {}
+    }
+
     companion object {
         const val ACTION_PLAY_QUEUE = "com.bbg221.musicplayer.action.PLAY_QUEUE"
         const val ACTION_PLAY_PAUSE = "com.bbg221.musicplayer.action.PLAY_PAUSE"
@@ -42,14 +50,6 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, AudioManager.O
         private const val NOTIFICATION_ID = 1
 
         val listeners = CopyOnWriteArrayList<PlayerListener>()
-
-        interface PlayerListener {
-            fun onSongChanged(song: Song?, index: Int) {}
-            fun onPlayStateChanged(playing: Boolean) {}
-            fun onModeChanged(mode: Int) {}
-            fun onPositionChanged(position: Long, duration: Long) {}
-            fun onQueueChanged() {}
-        }
 
         @Volatile
         private var instance: MusicService? = null

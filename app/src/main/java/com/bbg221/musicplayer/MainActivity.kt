@@ -28,13 +28,19 @@ class MainActivity : AppCompatActivity(), MusicService.PlayerListener {
         ActivityResultContracts.RequestMultiplePermissions()
     ) { }
 
+    private val deleteResultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        deleteHelper.onResult(result.resultCode)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         PlaylistStore.init(this)
-        deleteHelper = DeleteHelper(this) { song ->
+        deleteHelper = DeleteHelper(this, deleteResultLauncher) { song ->
             onSongDeleted(song)
         }
 

@@ -5,7 +5,7 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.provider.MediaStore
-import android.provider.RecoverableSecurityException
+import android.app.RecoverableSecurityException
 import com.bbg221.musicplayer.model.Song
 
 object SongRepository {

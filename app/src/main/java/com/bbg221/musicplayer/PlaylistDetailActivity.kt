@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bbg221.musicplayer.adapter.SongAdapter
 import com.bbg221.musicplayer.data.DeleteHelper
@@ -25,6 +26,12 @@ class PlaylistDetailActivity : AppCompatActivity() {
     private lateinit var adapter: SongAdapter
     private lateinit var deleteHelper: DeleteHelper
 
+    private val deleteResultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        deleteHelper.onResult(result.resultCode)
+    }
+
     private var playlistId: String = ""
     private var allSongs: List<Song> = emptyList()
     private var playlistSongs: List<Song> = emptyList()
@@ -40,7 +47,7 @@ class PlaylistDetailActivity : AppCompatActivity() {
             return
         }
 
-        deleteHelper = DeleteHelper(this) { song ->
+        deleteHelper = DeleteHelper(this, deleteResultLauncher) { song ->
             removeFromAllPlaylists(song)
             loadSongs()
         }

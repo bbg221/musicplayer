@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bbg221.musicplayer.adapter.PlaylistAdapter
@@ -67,9 +68,7 @@ class PlaylistsFragment : Fragment() {
             FrameLayout.LayoutParams.MATCH_PARENT,
             FrameLayout.LayoutParams.WRAP_CONTENT
         )
-        val margin = resources.getDimensionPixelSize(
-            com.google.android.material.R.dimen.mtrl_alert_dialog_padding_medium
-        )
+        val margin = (24 * resources.displayMetrics.density).toInt()
         params.setMargins(margin, 0, margin, 0)
         container.addView(input, params)
         MaterialAlertDialogBuilder(requireContext())
