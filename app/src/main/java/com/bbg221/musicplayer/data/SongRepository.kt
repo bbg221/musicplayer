@@ -10,6 +10,8 @@ import com.bbg221.musicplayer.model.Song
 
 object SongRepository {
 
+    const val MIN_DURATION_MS = 30_000L
+
     fun scanAll(context: Context): List<Song> {
         val songs = mutableListOf<Song>()
         val collection = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
@@ -29,7 +31,9 @@ object SongRepository {
                 collection, projection, selection, null, sortOrder
             )?.use { cursor ->
                 while (cursor.moveToNext()) {
-                    songs.add(readSong(cursor, collection))
+                    val song = readSong(cursor, collection)
+                    if (song.duration < MIN_DURATION_MS) continue
+                    songs.add(song)
                 }
             }
         } catch (_: SecurityException) {

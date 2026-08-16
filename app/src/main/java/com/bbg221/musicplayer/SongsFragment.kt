@@ -44,6 +44,14 @@ class SongsFragment : Fragment() {
         )
         binding.recyclerSongs.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerSongs.adapter = adapter
+        binding.btnScan.setOnClickListener {
+            refresh()
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.scan_done, allSongs.size),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     override fun onResume() {

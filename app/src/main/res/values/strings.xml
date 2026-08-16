@@ -4,6 +4,8 @@
     <string name="tab_songs">歌曲</string>
     <string name="tab_playlists">歌单</string>
     <string name="local_music">本地音乐</string>
+    <string name="scan">扫描</string>
+    <string name="scan_done">扫描完成，共 %1$d 首歌曲</string>
     <string name="song_count">共 %1$d 首歌曲</string>
     <string name="no_songs">没有找到歌曲，请先授权读取音频</string>
     <string name="no_permission">需要存储权限才能扫描本地音乐</string>
