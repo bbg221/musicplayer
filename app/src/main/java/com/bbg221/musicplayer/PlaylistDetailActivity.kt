@@ -24,6 +24,7 @@ class PlaylistDetailActivity : AppCompatActivity() {
     private lateinit var adapter: SongAdapter
 
     private var playlistId: String = ""
+    private var playlistName: String = ""
     private var allSongs: List<Song> = emptyList()
     private var playlistSongs: List<Song> = emptyList()
 
@@ -40,7 +41,7 @@ class PlaylistDetailActivity : AppCompatActivity() {
 
         adapter = SongAdapter(
             onItemClick = { song, position ->
-                MusicService.playQueue(this, playlistSongs, position)
+                MusicService.playQueue(this, playlistSongs, position, playlistName)
                 startActivity(Intent(this, PlayerActivity::class.java))
             },
             onMenuClick = { song, position, anchor -> showSongMenu(song, anchor) }
@@ -65,6 +66,7 @@ class PlaylistDetailActivity : AppCompatActivity() {
             return
         }
         binding.tvPlaylistName.text = playlist.name
+        playlistName = playlist.name
         allSongs = SongRepository.getAll(this)
         val byId = allSongs.associateBy { it.id }
         playlistSongs = playlist.songIds.mapNotNull { byId[it] }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">音乐播放器</string>
-    <string name="tab_songs">歌曲</string>
+    <string name="tab_songs">所有歌曲</string>
     <string name="tab_playlists">歌单</string>
     <string name="local_music">本地音乐</string>
     <string name="scan">扫描</string>
@@ -33,6 +33,8 @@
     <string name="mode_sequence">顺序播放</string>
     <string name="mode_loop_one">单曲循环</string>
     <string name="now_playing">正在播放</string>
+    <string name="now_playing_all">正在播放所有歌曲</string>
+    <string name="now_playing_playlist">正在播放歌单《%1$s》</string>
     <string name="not_playing">未在播放</string>
     <string name="song_removed">已移除《%1$s》</string>
     <string name="select_playlist">选择歌单</string>

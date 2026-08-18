@@ -63,6 +63,10 @@ class PlayerActivity : AppCompatActivity(), MusicService.PlayerListener {
         updateMode()
     }
 
+    override fun onQueueChanged() {
+        updateNowPlaying()
+    }
+
     override fun onPositionChanged(position: Long, duration: Long) {
         if (userSeeking) return
         if (duration > 0) {
@@ -74,10 +78,20 @@ class PlayerActivity : AppCompatActivity(), MusicService.PlayerListener {
 
     private fun updateAll() {
         updateSongInfo()
+        updateNowPlaying()
         updatePlayButton()
         updateMode()
         if (MusicService.currentSong() == null) {
             finish()
+        }
+    }
+
+    private fun updateNowPlaying() {
+        val title = MusicService.queueTitle()
+        binding.tvNowPlaying.text = if (title.isNullOrEmpty()) {
+            getString(R.string.now_playing_all)
+        } else {
+            getString(R.string.now_playing_playlist, title)
         }
     }
 

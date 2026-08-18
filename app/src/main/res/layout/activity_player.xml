@@ -6,11 +6,22 @@
     android:orientation="vertical"
     android:padding="24dp">
 
+    <TextView
+        android:id="@+id/tv_now_playing"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:singleLine="true"
+        android:textAppearance="?attr/textAppearanceTitleMedium"
+        android:textColor="?attr/colorPrimary" />
+
     <ImageView
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="24dp"
         android:contentDescription="@string/now_playing"
         android:src="@drawable/ic_album" />
 

@@ -41,6 +41,7 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, AudioManager.O
         const val EXTRA_QUEUE = "extra_queue"
         const val EXTRA_INDEX = "extra_index"
         const val EXTRA_POSITION = "extra_position"
+        const val EXTRA_QUEUE_TITLE = "extra_queue_title"
 
         const val MODE_SEQUENCE = 0
         const val MODE_LOOP_ONE = 1
@@ -86,17 +87,22 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, AudioManager.O
             )
         }
 
-        fun playQueue(context: Context, queue: List<Song>, index: Int) {
+        fun playQueue(context: Context, queue: List<Song>, index: Int, queueTitle: String? = null) {
             val intent = Intent(context, MusicService::class.java)
                 .setAction(ACTION_PLAY_QUEUE)
                 .putParcelableArrayListExtra(EXTRA_QUEUE, ArrayList(queue))
                 .putExtra(EXTRA_INDEX, index)
+                .putExtra(EXTRA_QUEUE_TITLE, queueTitle)
             context.startService(intent)
         }
+
+        fun queueTitle(): String? = instance?.queueTitle
     }
 
     private val queue = mutableListOf<Song>()
     private var index = -1
+    var queueTitle: String? = null
+        private set
     var mode: Int = MODE_SEQUENCE
         private set
     private var mp: MediaPlayer? = null
@@ -140,7 +146,9 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, AudioManager.O
                 if (newQueue != null) {
                     queue.clear()
                     queue.addAll(newQueue)
+                    queueTitle = intent.getStringExtra(EXTRA_QUEUE_TITLE)
                     playIndex(newIndex.coerceIn(0, (queue.size - 1).coerceAtLeast(0)))
+                    notifyQueueChanged()
                 }
             }
             ACTION_PLAY_PAUSE -> togglePlayPause()
@@ -370,6 +378,10 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, AudioManager.O
 
     private fun notifyMode() {
         listeners.forEach { it.onModeChanged(mode) }
+    }
+
+    private fun notifyQueueChanged() {
+        listeners.forEach { it.onQueueChanged() }
     }
 
     private fun notifyPosition() {
