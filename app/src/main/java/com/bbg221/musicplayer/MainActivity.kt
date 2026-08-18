@@ -10,8 +10,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.bbg221.musicplayer.data.DeleteHelper
 import com.bbg221.musicplayer.data.PlaylistStore
+import com.bbg221.musicplayer.data.SongRepository
 import com.bbg221.musicplayer.databinding.ActivityMainBinding
 import com.bbg221.musicplayer.model.Song
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -19,7 +19,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class MainActivity : AppCompatActivity(), MusicService.PlayerListener {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var deleteHelper: DeleteHelper
 
     private val songsFragment = SongsFragment()
     private val playlistsFragment = PlaylistsFragment()
@@ -28,21 +27,12 @@ class MainActivity : AppCompatActivity(), MusicService.PlayerListener {
         ActivityResultContracts.RequestMultiplePermissions()
     ) { }
 
-    private val deleteResultLauncher = registerForActivityResult(
-        ActivityResultContracts.StartIntentSenderForResult()
-    ) { result ->
-        deleteHelper.onResult(result.resultCode)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         PlaylistStore.init(this)
-        deleteHelper = DeleteHelper(this, deleteResultLauncher) { song ->
-            onSongDeleted(song)
-        }
 
         binding.bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -111,19 +101,20 @@ class MainActivity : AppCompatActivity(), MusicService.PlayerListener {
             .setMessage(getString(R.string.delete_song_msg, song.title))
             .setNegativeButton(R.string.cancel, null)
             .setPositiveButton(R.string.delete) { _, _ ->
-                deleteHelper.delete(song)
+                removeSongFromLibrary(song)
             }
             .show()
     }
 
-    private fun onSongDeleted(song: Song) {
+    private fun removeSongFromLibrary(song: Song) {
+        SongRepository.remove(this, song)
         val playlists = PlaylistStore.repo.loadAll()
         var changed = false
         for (p in playlists) {
             if (p.songIds.remove(song.id)) changed = true
         }
         if (changed) PlaylistStore.saveAll(playlists)
-        Toast.makeText(this, getString(R.string.song_deleted, song.title), Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.song_removed, song.title), Toast.LENGTH_SHORT).show()
         val frag = supportFragmentManager.findFragmentByTag("songs")
         if (frag is SongsFragment) frag.refresh()
         val pf = supportFragmentManager.findFragmentByTag("playlists")

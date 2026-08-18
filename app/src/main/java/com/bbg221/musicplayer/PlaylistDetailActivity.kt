@@ -6,10 +6,8 @@ import android.view.View
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bbg221.musicplayer.adapter.SongAdapter
-import com.bbg221.musicplayer.data.DeleteHelper
 import com.bbg221.musicplayer.data.PlaylistStore
 import com.bbg221.musicplayer.data.SongRepository
 import com.bbg221.musicplayer.databinding.ActivityPlaylistDetailBinding
@@ -24,13 +22,6 @@ class PlaylistDetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPlaylistDetailBinding
     private lateinit var adapter: SongAdapter
-    private lateinit var deleteHelper: DeleteHelper
-
-    private val deleteResultLauncher = registerForActivityResult(
-        ActivityResultContracts.StartIntentSenderForResult()
-    ) { result ->
-        deleteHelper.onResult(result.resultCode)
-    }
 
     private var playlistId: String = ""
     private var allSongs: List<Song> = emptyList()
@@ -45,11 +36,6 @@ class PlaylistDetailActivity : AppCompatActivity() {
         if (playlistId.isEmpty()) {
             finish()
             return
-        }
-
-        deleteHelper = DeleteHelper(this, deleteResultLauncher) { song ->
-            removeFromAllPlaylists(song)
-            loadSongs()
         }
 
         adapter = SongAdapter(
@@ -79,7 +65,7 @@ class PlaylistDetailActivity : AppCompatActivity() {
             return
         }
         binding.tvPlaylistName.text = playlist.name
-        allSongs = SongRepository.scanAll(this)
+        allSongs = SongRepository.getAll(this)
         val byId = allSongs.associateBy { it.id }
         playlistSongs = playlist.songIds.mapNotNull { byId[it] }
         adapter.submit(playlistSongs)
@@ -101,7 +87,7 @@ class PlaylistDetailActivity : AppCompatActivity() {
                             .setMessage(getString(R.string.delete_song_msg, song.title))
                             .setNegativeButton(R.string.cancel, null)
                             .setPositiveButton(R.string.delete) { _, _ ->
-                                deleteHelper.delete(song)
+                                removeSongFromLibrary(song)
                             }
                             .show()
                         true
@@ -128,6 +114,13 @@ class PlaylistDetailActivity : AppCompatActivity() {
             if (p.songIds.remove(song.id)) changed = true
         }
         if (changed) PlaylistStore.saveAll(playlists)
+    }
+
+    private fun removeSongFromLibrary(song: Song) {
+        SongRepository.remove(this, song)
+        removeFromAllPlaylists(song)
+        Toast.makeText(this, getString(R.string.song_removed, song.title), Toast.LENGTH_SHORT).show()
+        loadSongs()
     }
 
     private fun showPlaylistMenu() {
@@ -161,7 +154,7 @@ class PlaylistDetailActivity : AppCompatActivity() {
 
     private fun showAddSongsDialog() {
         if (allSongs.isEmpty()) {
-            allSongs = SongRepository.scanAll(this)
+            allSongs = SongRepository.getAll(this)
         }
         if (allSongs.isEmpty()) {
             Toast.makeText(this, R.string.no_songs, Toast.LENGTH_SHORT).show()

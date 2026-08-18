@@ -5,14 +5,29 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.provider.MediaStore
-import android.app.RecoverableSecurityException
 import com.bbg221.musicplayer.model.Song
+import org.json.JSONArray
+import org.json.JSONObject
+import java.io.File
 
 object SongRepository {
 
     const val MIN_DURATION_MS = 30_000L
 
-    fun scanAll(context: Context): List<Song> {
+    private const val FILE_NAME = "songs.json"
+
+    private fun cacheFile(context: Context): File = File(context.filesDir, FILE_NAME)
+
+    fun isScanned(context: Context): Boolean = cacheFile(context).exists()
+
+    fun getAll(context: Context): List<Song> {
+        if (isScanned(context)) return loadCached(context)
+        val songs = scanAll(context) ?: return emptyList()
+        save(context, songs)
+        return songs
+    }
+
+    fun scanAll(context: Context): List<Song>? {
         val songs = mutableListOf<Song>()
         val collection = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         val projection = arrayOf(
@@ -26,7 +41,7 @@ object SongRepository {
         )
         val selection = "${MediaStore.Audio.Media.IS_MUSIC} != 0"
         val sortOrder = "${MediaStore.Audio.Media.TITLE} COLLATE NOCASE ASC"
-        try {
+        return try {
             context.contentResolver.query(
                 collection, projection, selection, null, sortOrder
             )?.use { cursor ->
@@ -36,10 +51,10 @@ object SongRepository {
                     songs.add(song)
                 }
             }
+            songs
         } catch (_: SecurityException) {
-            return emptyList()
+            null
         }
-        return songs
     }
 
     private fun readSong(cursor: Cursor, collection: Uri): Song {
@@ -65,13 +80,58 @@ object SongRepository {
         )
     }
 
-    fun delete(context: Context, song: Song): Boolean {
+    fun save(context: Context, songs: List<Song>) {
+        val array = JSONArray()
+        for (s in songs) {
+            array.put(
+                JSONObject()
+                    .put("id", s.id)
+                    .put("title", s.title)
+                    .put("artist", s.artist)
+                    .put("album", s.album)
+                    .put("duration", s.duration)
+                    .put("albumId", s.albumId)
+                    .put("size", s.size)
+            )
+        }
+        cacheFile(context).writeText(array.toString())
+    }
+
+    fun loadCached(context: Context): List<Song> {
+        val file = cacheFile(context)
+        if (!file.exists()) return emptyList()
+        val result = mutableListOf<Song>()
         return try {
-            context.contentResolver.delete(song.uri, null, null) > 0
-        } catch (e: RecoverableSecurityException) {
-            throw e
-        } catch (e: SecurityException) {
-            throw e
+            val array = JSONArray(file.readText())
+            for (i in 0 until array.length()) {
+                val obj = array.getJSONObject(i)
+                val id = obj.getLong("id")
+                result.add(
+                    Song(
+                        id = id,
+                        title = obj.optString("title", "未知歌曲"),
+                        artist = obj.optString("artist", "未知艺术家"),
+                        album = obj.optString("album", "未知专辑"),
+                        duration = obj.optLong("duration"),
+                        albumId = obj.optLong("albumId"),
+                        size = obj.optLong("size"),
+                        uri = ContentUris.withAppendedId(
+                            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id
+                        )
+                    )
+                )
+            }
+            result
+        } catch (_: Exception) {
+            file.delete()
+            emptyList()
+        }
+    }
+
+    fun remove(context: Context, song: Song) {
+        val songs = loadCached(context).toMutableList()
+        if (songs.removeAll { it.id == song.id }) {
+            save(context, songs)
         }
     }
 }

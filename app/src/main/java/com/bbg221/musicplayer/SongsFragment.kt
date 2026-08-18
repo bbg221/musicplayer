@@ -45,7 +45,7 @@ class SongsFragment : Fragment() {
         binding.recyclerSongs.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerSongs.adapter = adapter
         binding.btnScan.setOnClickListener {
-            refresh()
+            refresh(forceScan = true)
             Toast.makeText(
                 requireContext(),
                 getString(R.string.scan_done, allSongs.size),
@@ -59,9 +59,13 @@ class SongsFragment : Fragment() {
         refresh()
     }
 
-    fun refresh() {
+    fun refresh(forceScan: Boolean = false) {
         val context = requireContext()
-        allSongs = SongRepository.scanAll(context)
+        allSongs = if (forceScan) {
+            SongRepository.scanAll(context)?.also { SongRepository.save(context, it) } ?: emptyList()
+        } else {
+            SongRepository.getAll(context)
+        }
         adapter.submit(allSongs)
         binding.tvSongCount.text = getString(R.string.song_count, allSongs.size)
         binding.tvEmpty.visibility =
